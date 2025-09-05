@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 
 (async () => {
     try {
-        await mongoose.connect('mongodb+srv://quadrant593:mubULtnialEeSsxy@quadrant.tewouce.mongodb.net/ieee', {
+        await mongoose.connect('mongodb+srv://quadrant593:mubULtnialEeSsxy@quadrant.tewouce.mongodb.net/code-veda', {
             useNewUrlParser: true,
             useUnifiedTopology: true,
         });

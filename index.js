@@ -140,60 +140,6 @@ app.delete('/events/:id', async (req, res) => {
   }
 });
 
-// Hire-----------------------------------------------------------------------------------------------------------------
-// CREATE
-app.post('/hire', async (req, res) => {
-  try {
-    const hire = new HireModel(req.body);
-    const saved = await hire.save();
-    res.status(201).json(saved);
-  } catch (err) {
-    res.status(400).json({ error: err.message });
-  }
-});
-
-// READ (future hires only)
-app.get('/hire', async (req, res) => {
-  try {
-    const now = new Date();
-    const hires = await HireModel.find({ last_date: { $gt: now } }).sort({ last_date: 1 });
-    res.json(hires);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// READ by ID
-app.get('/hire/:id', async (req, res) => {
-  try {
-    const hire = await HireModel.findById(req.params.id);
-    if (!hire) return res.status(404).json({ message: 'Hire not found' });
-    res.json(hire);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// UPDATE
-app.put('/hire/:id', async (req, res) => {
-  try {
-    const updated = await HireModel.findByIdAndUpdate(req.params.id, req.body, { new: true });
-    res.json(updated);
-  } catch (err) {
-    res.status(400).json({ error: err.message });
-  }
-});
-
-// DELETE
-app.delete('/hire/:id', async (req, res) => {
-  try {
-    await HireModel.findByIdAndDelete(req.params.id);
-    res.json({ message: 'Deleted successfully' });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
 // Auth-----------------------------------------------------------------------------------------------------------------
 import { UserModel } from './src/mongodb/DummyAuth.js';
 app.post('/signup', async (req, res) => {
@@ -241,7 +187,7 @@ app.get('/login/:name/:password', async (req, res) => {
     res.status(200).json({
       message: 'Login successful',
       user: {
-        id: user._id,            // ✅ return MongoDB ID
+        id: user._id,
         name: user.name,
         location: user.location, // optional but useful
         credits: user.credits,
@@ -351,7 +297,64 @@ console.log(await response)
   }
 });
 
-// Applications -------------------------------------------------------------------------------------------------------
+// Hire-----------------------------------------------------------------------------------------------------------------
+// CREATE
+app.post('/hire', async (req, res) => {
+  try {
+    const hire = new HireModel(req.body);
+    const saved = await hire.save();
+    res.status(201).json(saved);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+// READ (future hires only)
+app.get('/hire', async (req, res) => {
+  try {
+    const now = new Date();
+    const hires = await HireModel.find({ last_date: { $gt: now } }).sort({ last_date: 1 });
+    res.json(hires);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// READ by ID
+app.get('/hire/:id', async (req, res) => {
+  try {
+    const hire = await HireModel.findById(req.params.id);
+    if (!hire) return res.status(404).json({ message: 'Hire not found' });
+    res.json(hire);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// UPDATE
+app.put('/hire/:id', async (req, res) => {
+  try {
+    const updated = await HireModel.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    res.json(updated);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+// DELETE
+app.delete('/hire/:id', async (req, res) => {
+  try {
+    await HireModel.findByIdAndDelete(req.params.id);
+    res.json({ message: 'Deleted successfully' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// --------------------
+// Applications API
+// --------------------
+
 // CREATE Application (user applies to a hire post)
 app.post('/applications', async (req, res) => {
   try {
@@ -367,7 +370,6 @@ app.post('/applications', async (req, res) => {
 app.get('/applications/hire/:hireId', async (req, res) => {
   try {
     const applications = await ApplicationModel.find({ hire: req.params.hireId })
-      .populate('applicant', 'name badges credits') // fetch applicant details
       .sort({ createdAt: -1 });
     res.json(applications);
   } catch (err) {
@@ -375,24 +377,69 @@ app.get('/applications/hire/:hireId', async (req, res) => {
   }
 });
 
-// READ all applications by a specific user
-app.get('/applications/user/:userId', async (req, res) => {
+// READ a single application (by ID)
+app.get('/applications/:id', async (req, res) => {
   try {
-    const applications = await ApplicationModel.find({ applicant: req.params.userId })
-      .populate('hire', 'serviceType location status lastDate')
-      .sort({ createdAt: -1 });
-    res.json(applications);
+    const application = await ApplicationModel.findById(req.params.id);
+    if (!application) return res.status(404).json({ message: 'Application not found' });
+    res.json(application);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-// UPDATE application status
-app.put('/applications/:id', async (req, res) => {
+// UPDATE application status (generic)
+app.put('/applications/:id/status', async (req, res) => {
+  try {
+    const { status } = req.body; // expected: "pending" | "accepted" | "rejected" | "withdrawn"
+    const updated = await ApplicationModel.findByIdAndUpdate(
+      req.params.id,
+      { status },
+      { new: true }
+    );
+    if (!updated) return res.status(404).json({ message: 'Application not found' });
+    res.json(updated);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+// QUICK STATUS CHANGE (ACCEPT)
+app.put('/applications/:id/accept', async (req, res) => {
   try {
     const updated = await ApplicationModel.findByIdAndUpdate(
       req.params.id,
-      { status: req.body.status },
+      { status: 'accepted' },
+      { new: true }
+    );
+    if (!updated) return res.status(404).json({ message: 'Application not found' });
+    res.json(updated);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+// QUICK STATUS CHANGE (REJECT)
+app.put('/applications/:id/reject', async (req, res) => {
+  try {
+    const updated = await ApplicationModel.findByIdAndUpdate(
+      req.params.id,
+      { status: 'rejected' },
+      { new: true }
+    );
+    if (!updated) return res.status(404).json({ message: 'Application not found' });
+    res.json(updated);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+// QUICK STATUS CHANGE (WITHDRAW)
+app.put('/applications/:id/withdraw', async (req, res) => {
+  try {
+    const updated = await ApplicationModel.findByIdAndUpdate(
+      req.params.id,
+      { status: 'withdrawn' },
       { new: true }
     );
     if (!updated) return res.status(404).json({ message: 'Application not found' });

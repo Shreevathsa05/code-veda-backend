@@ -46,18 +46,18 @@ export const EventsModel = mongoose.model('CommunityEvent', communityEventsSchem
 // --------------------
 const communityHireSchema = new mongoose.Schema({
   serviceType: {
-    type: String,        
+    type: String,
     required: true
   },
   description: {
     type: String
   },
   lastDate: {
-    type: Date,         
+    type: Date,
     required: true
   },
   location: {
-    type: String,      
+    type: String,
     required: true
   },
   contactName: {
@@ -89,24 +89,33 @@ const communityHireSchema = new mongoose.Schema({
 export const HireModel = mongoose.model('CommunityHire', communityHireSchema);
 
 // --------------------
-// Application Schema
+// Application Schema (for local hires, no user account needed)
 // --------------------
 const applicationSchema = new mongoose.Schema({
-  applicant: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User', // user applying
-    required: true
-  },
   hire: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'CommunityHire', // the hire post being applied to
+    ref: 'CommunityHire',
     required: true
   },
-  coverLetter: {
-    type: String
+  name: {
+    type: String,
+    required: true
   },
-  resumeLink: {
-    type: String
+  age: {
+    type: Number,
+    required: false
+  },
+  phone: {
+    type: String,
+    required: true
+  },
+  address: {
+    type: String,
+    required: false
+  },
+  message: {
+    type: String, // short note like "I can work evenings" or "5 years plumber experience"
+    required: false
   },
   status: {
     type: String,
