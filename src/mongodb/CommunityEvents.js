@@ -53,7 +53,7 @@ const communityHireSchema = new mongoose.Schema({
     type: String
   },
   lastDate: {
-    type: Date,
+    type: String,
     required: true
   },
   location: {
@@ -75,9 +75,10 @@ const communityHireSchema = new mongoose.Schema({
     type: String
   },
   poster: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User', // who posted this hire opportunity
-    required: true
+    // type: mongoose.Schema.Types.ObjectId,
+    type:String,
+    // ref: 'User', // who posted this hire opportunity
+    required: false
   },
   status: {
     type: String,

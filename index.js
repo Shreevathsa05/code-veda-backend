@@ -159,21 +159,31 @@ app.post("/signup", async (req, res) => {
     if (existingUser) {
       return res.status(409).json({ message: "Username already exists" });
     }
-    const savedUser = await newUser.save();
-    // Create and save user
+
+    // Create new user
     const newUser = new UserModel({
-      id: savedUser._id,
       name,
-      password: password,
+      password,   // ⚠️ store hashed later with bcrypt
       credits: 0,
       badges: [""],
     });
 
-    res.status(201).json({ message: "User created successfully" });
+    const savedUser = await newUser.save();
+
+    res.status(201).json({
+      message: "User created successfully",
+      user: {
+        id: savedUser._id,
+        name: savedUser.name,
+        credits: savedUser.credits,
+        badges: savedUser.badges,
+      },
+    });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
+
 
 app.get("/login/:name/:password", async (req, res) => {
   try {
