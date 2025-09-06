@@ -358,10 +358,12 @@ app.post("/hire", async (req, res) => {
 app.get("/hire", async (req, res) => {
   try {
     const now = new Date();
+
     // Use $or to find documents where either last_date or lastDate is in the future
     const hires = await HireModel.find({
       $or: [{ last_date: { $gt: now } }, { lastDate: { $gt: now } }],
     }).sort({ last_date: 1, lastDate: 1 });
+
     res.json(hires);
   } catch (err) {
     res.status(500).json({ error: err.message });
