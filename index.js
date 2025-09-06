@@ -313,7 +313,9 @@ app.post('/hire', async (req, res) => {
 app.get('/hire', async (req, res) => {
   try {
     const now = new Date();
-    const hires = await HireModel.find({ last_date: { $gt: now } }).sort({ last_date: 1 });
+    // const hires = await HireModel.find({ last_date: { $gt: now } }).sort({ last_date: 1 });
+    // Corrected code
+    const hires = await HireModel.find({ lastDate: { $gt: now } });
     res.json(hires);
   } catch (err) {
     res.status(500).json({ error: err.message });
