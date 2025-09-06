@@ -279,7 +279,7 @@ app.delete("/local-alerts/:id", async (req, res) => {
 });
 
 // AI endpoints---------------------------------------------------------------------------------------------------------
-import { HazardDetectionResponseModel } from "./src/mongodb/hazardDetectionResponseSchema.js";
+import { ReportAnalyzerSchema } from "./src/mongodb/ReportAnalyzerSchema.js";
 // image
 app.post("/api/report", async (req, res) => {
   try {
