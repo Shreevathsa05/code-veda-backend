@@ -279,25 +279,7 @@ app.delete("/local-alerts/:id", async (req, res) => {
 });
 
 // AI endpoints---------------------------------------------------------------------------------------------------------
-// Video
-app.post("/api/detect", async (req, res) => {
-  try {
-    const b64_video = req.body.video;
-    const response = JSON.parse(await getRes(b64_video));
-    console.log(await response);
-    if (response.status != "safe") {
-      const hazardResponse = new HazardDetectionResponseModel(await response);
-
-      console.log(await hazardResponse.save());
-    }
-
-    res.send(await response);
-  } catch (error) {
-    console.log(error);
-    res.send("Error");
-  }
-});
-
+import { HazardDetectionResponseModel } from "./src/mongodb/hazardDetectionResponseSchema.js";
 // image
 app.post("/api/report", async (req, res) => {
   try {
