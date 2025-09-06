@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 const hazardDetectionResponseSchema = new mongoose.Schema({
   status: {
     type: String,
-    enum: ['safe', 'hazard_detected'],
+    enum: ['true', 'false'],
     required: true
   },
   emergencyServicesRequired: {

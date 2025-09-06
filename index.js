@@ -1,6 +1,6 @@
 import cors from "cors";
 import express from "express";
-import { ReportAnalyzer } from "./src/OtherAiModels.js";
+import { ReportAnalyzer, ReportAnalyzerSchema } from "./src/OtherAiModels.js";
 // dotenv.config();
 
 import { ReportModel } from "./src/mongodb/ReportAnalyzerSchema.js";
@@ -297,7 +297,7 @@ app.post("/api/report", async (req, res) => {
 
     console.log(await response);
 
-    const hazardResponse = new HazardDetectionResponseModel(await response);
+    const hazardResponse = new ReportAnalyzerSchema(await response);
 
     console.log(await hazardResponse.save());
 
